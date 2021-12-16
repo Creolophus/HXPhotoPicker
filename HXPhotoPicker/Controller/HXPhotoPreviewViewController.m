@@ -2,8 +2,8 @@
 //  HXPhotoPreviewViewController.m
 //  HXPhotoPickerExample
 //
-//  Created by 洪欣 on 2017/10/14.
-//  Copyright © 2017年 洪欣. All rights reserved.
+//  Created by Silence on 2017/10/14.
+//  Copyright © 2017年 Silence. All rights reserved.
 //
 
 #import "HXPhotoPreviewViewController.h"
@@ -24,15 +24,13 @@
 #import "UIImageView+HXExtension.h"
 #import "UIColor+HXExtension.h"
 
-#define HXDARKVIEWWIDTH 64
-#define HXMOREBTNWIDTH 64
+#define HXDARKVIEWWIDTH 30
 
 @interface HXPhotoPreviewViewController ()
 <
 UICollectionViewDataSource,
 UICollectionViewDelegate,
 HXPhotoPreviewBottomViewDelegate,
-HXPhotoPreviewBottomCollectionViewDelegate,
 HXPhotoEditViewControllerDelegate,
 HXVideoEditViewControllerDelegate,
 HX_PhotoEditViewControllerDelegate
@@ -57,7 +55,6 @@ HX_PhotoEditViewControllerDelegate
 @property (strong, nonatomic) UIPageControl *bottomPageControl;
 @property (strong, nonatomic) UIView *darkCancelView;
 @property (strong, nonatomic) UIView *darkDeleteView;
-@property (strong, nonatomic) UIButton *moreBtn;
 @property (strong, nonatomic) UIButton *darkCancelBtn;
 @property (strong, nonatomic) UIButton *darkDeleteBtn;
 @property (assign, nonatomic) BOOL statusBarShouldBeHidden;
@@ -76,6 +73,10 @@ HX_PhotoEditViewControllerDelegate
             [self changeStatusBarStyle];
             [self setNeedsStatusBarAppearanceUpdate];
             [self.collectionView reloadData];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                HXPhotoPreviewViewCell *cell = (HXPhotoPreviewViewCell *)[self.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:self.currentModelIndex inSection:0]];
+                [cell requestHDImage];
+            });
         }
     }
 #endif
@@ -146,7 +147,7 @@ HX_PhotoEditViewControllerDelegate
     if (!self) {
         return [super prefersStatusBarHidden];
     }
-    return _statusBarShouldBeHidden;
+    return self.statusBarShouldBeHidden;
 }
 - (UIStatusBarAnimation)preferredStatusBarUpdateAnimation {
     return UIStatusBarAnimationFade;
@@ -205,10 +206,30 @@ HX_PhotoEditViewControllerDelegate
             [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationFade];
         }
     }
+    if (self.manager.viewWillAppear) {
+        self.manager.viewWillAppear(self);
+    }
 }
 #pragma clang diagnostic pop
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
+    HXPhotoModel *model = self.modelArray[self.currentModelIndex];
+    self.currentModel = model;
+    HXPhotoPreviewViewCell *cell = (HXPhotoPreviewViewCell *)[self.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:self.currentModelIndex inSection:0]];
+    if (!cell) {
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.25 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            NSIndexPath *indexPath = [NSIndexPath indexPathForItem:self.currentModelIndex inSection:0];
+            if ([HXPhotoTools isRTLLanguage]) {
+                indexPath = [NSIndexPath indexPathForItem:self.modelArray.count - 1 - self.currentModelIndex inSection:0];
+            }
+            HXPhotoPreviewViewCell *tempCell = (HXPhotoPreviewViewCell *)[self.collectionView cellForItemAtIndexPath:indexPath];
+            self.tempCell = tempCell;
+            [tempCell requestHDImage];
+        });
+    }else {
+        self.tempCell = cell;
+        [cell requestHDImage];
+    }
     if (!self.isAddInteractiveTransition) {
         if (!self.outside) {
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.25 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
@@ -227,8 +248,10 @@ HX_PhotoEditViewControllerDelegate
         }
         self.isAddInteractiveTransition = YES;
     }
+    if (self.manager.viewDidAppear) {
+        self.manager.viewDidAppear(self);
+    }
 }
-
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
     if (self.exteriorPreviewStyle == HXPhotoViewPreViewShowStyleDark) {
@@ -244,6 +267,15 @@ HX_PhotoEditViewControllerDelegate
     cell.stopCancel = self.stopCancel;
     [cell cancelRequest];
     self.stopCancel = NO;
+    if (self.manager.viewWillDisappear) {
+        self.manager.viewWillDisappear(self);
+    }
+}
+- (void)viewDidDisappear:(BOOL)animated {
+    [super viewDidDisappear:animated];
+    if (self.manager.viewDidDisappear) {
+        self.manager.viewDidDisappear(self);
+    }
 }
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -258,48 +290,15 @@ HX_PhotoEditViewControllerDelegate
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deviceOrientationWillChanged:) name:UIApplicationWillChangeStatusBarOrientationNotification object:nil];
     
     [self addGesture];
-    [self requestImage];
-}
-
-- (BOOL)preferredNavigationBarHidden{
-    return YES;
-}
-
-- (BOOL)shouldCustomizeNavigationBarTransitionIfHideable{
-    return YES;
-}
-
-- (BOOL)forceEnableInteractivePopGestureRecognizer{
-    return YES;
-}
-
-- (void)moreClick:(UIButton *)sender {
     
-    if (self.manager.configuration.previewRespondsToMore) {
-        HXPhotoModel *model;
-        if (self.modelArray.count) model = self.modelArray[self.currentModelIndex];
-        self.manager.configuration.previewRespondsToMore(sender, model, self.manager, self);
+}
+- (void)setCellImage:(UIImage *)image {
+    if (image) {
+        HXPhotoPreviewViewCell *cell = (HXPhotoPreviewViewCell *)[self.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:self.currentModelIndex inSection:0]];
+        cell.previewContentView.imageView.image = image;
     }
-    
 }
-
 #pragma mark - < private >
-- (void)requestImage {
-    HXPhotoModel *model = self.modelArray[self.currentModelIndex];
-    self.currentModel = model;
-    HXPhotoPreviewViewCell *cell = (HXPhotoPreviewViewCell *)[self.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:self.currentModelIndex inSection:0]];
-    if (!cell) {
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.25 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            HXPhotoPreviewViewCell *tempCell = (HXPhotoPreviewViewCell *)[self.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:self.currentModelIndex inSection:0]];
-            self.tempCell = tempCell;
-            [tempCell requestHDImage];
-        });
-    }else {
-        self.tempCell = cell;
-        [cell requestHDImage];
-    }
-}
-
 - (void)setExteriorPreviewStyle:(HXPhotoViewPreViewShowStyle)exteriorPreviewStyle {
     _exteriorPreviewStyle = exteriorPreviewStyle;
     if (exteriorPreviewStyle == HXPhotoViewPreViewShowStyleDark) {
@@ -400,7 +399,7 @@ HX_PhotoEditViewControllerDelegate
                 self.darkDeleteView.frame = CGRectMake(self.view.hx_w - HXDARKVIEWWIDTH - 15, topMargin, HXDARKVIEWWIDTH, HXDARKVIEWWIDTH);
             }
             self.darkCancelView.frame = CGRectMake(0, topMargin, HXDARKVIEWWIDTH, HXDARKVIEWWIDTH);
-            self.moreBtn.frame = CGRectMake(self.view.frame.size.width-HXMOREBTNWIDTH, topMargin, HXMOREBTNWIDTH, HXMOREBTNWIDTH);
+            //self.moreBtn.frame = CGRectMake(self.view.frame.size.width-HXMOREBTNWIDTH, topMargin, HXMOREBTNWIDTH, HXMOREBTNWIDTH);//sunwf-n
             
             CGFloat pageControlY = HX_IS_IPhoneX_All ? self.view.hx_h - 40 : self.view.hx_h - 30;
             self.bottomPageControl.frame = CGRectMake(0, pageControlY, self.view.hx_w, 10);
@@ -556,7 +555,7 @@ HX_PhotoEditViewControllerDelegate
         }
     }
     
-    UIBarButtonItem *leftItem = [[UIBarButtonItem alloc] initWithImage:[[UIImage imageNamed:@"back"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] style:UIBarButtonItemStylePlain target:self action: @selector(backClick)];
+    UIBarButtonItem *leftItem = [[UIBarButtonItem alloc] initWithImage:[[UIImage hx_imageNamed:@"hx_nav_back"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] style:UIBarButtonItemStylePlain target:self action: @selector(backClick)];
     self.navigationItem.leftBarButtonItem = leftItem;
     
 //    UIBarButtonItem *rightItem = [[UIBarButtonItem alloc] initWithImage:[[UIImage imageNamed:@"icon图片列表"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] style:UIBarButtonItemStylePlain target:self action: @selector(moreClick)];
@@ -609,9 +608,9 @@ HX_PhotoEditViewControllerDelegate
             self.darkDeleteView.hidden = NO;
             [self.view addSubview:self.darkCancelView];
             
-            if (![self.ishidden isEqualToString:@"hidden"]){
-                [self.view addSubview:self.moreBtn];
-            }
+//            if (![self.ishidden isEqualToString:@"hidden"]){
+//                [self.view addSubview:self.moreBtn];
+//            } //sunwf
             
             if (self.previewShowDeleteButton) {
                 [self.view addSubview:self.darkDeleteView];
@@ -666,13 +665,12 @@ HX_PhotoEditViewControllerDelegate
         anim.values = @[@(1.2),@(0.8),@(1.1),@(0.9),@(1.0)];
         [button.layer addAnimation:anim forKey:@""];
     }
-//    CGFloat selectTextWidth = [self.selectBtn.titleLabel hx_getTextWidth];
-//    if (selectTextWidth + 10 > 24 && self.selectBtn.selected) {
-//        self.selectBtn.hx_w = selectTextWidth + 10;
-//    }else {
-//        self.selectBtn.hx_w = 24;
-//    }
-    
+    CGFloat selectTextWidth = [self.selectBtn.titleLabel hx_getTextWidth];
+    if (selectTextWidth + 10 > 24 && self.selectBtn.selected) {
+        self.selectBtn.hx_w = selectTextWidth + 10;
+    }else {
+        self.selectBtn.hx_w = 24;
+    }
     UIColor *btnBgColor = self.manager.configuration.previewSelectedBtnBgColor ?: self.manager.configuration.themeColor;
     if ([HXPhotoCommon photoCommon].isDark) {
         btnBgColor = self.manager.configuration.previewDarkSelectBgColor;
@@ -682,16 +680,12 @@ HX_PhotoEditViewControllerDelegate
         [self.delegate photoPreviewControllerDidSelect:self model:model];
     }
     self.bottomView.selectCount = [self.manager selectedCount];
-    self.bottomCollectionView.selectCount = [self.manager selectedCount];
     if (button.selected) {
         [self.bottomView insertModel:model];
-        [self.bottomCollectionView insertModel:model];
     }else {
         [self.bottomView deleteModel:model];
-        [self.bottomCollectionView deleteModel:model];
     }
 }
-
 - (void)cancelDismissClick {
     self.manager.selectPhotoing = NO;
     if ([self.delegate respondsToSelector:@selector(photoPreviewControllerDidCancel:model:)]) {
@@ -760,7 +754,6 @@ HX_PhotoEditViewControllerDelegate
             }
         }];
         [weakSelf.bottomView deleteModel:weakSelf.currentModel];
-        [weakSelf.bottomCollectionView deleteModel:weakSelf.currentModel];
         if (weakSelf.exteriorPreviewStyle == HXPhotoViewPreViewShowStyleDark) {
             weakSelf.bottomPageControl.numberOfPages = weakSelf.modelArray.count;
         }
@@ -792,17 +785,19 @@ HX_PhotoEditViewControllerDelegate
     }
     return (HXPhotoPreviewViewCell *)[self.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:self.currentModelIndex inSection:0]];
 }
+- (HXPhotoPreviewViewCell *)currentPreviewCell {
+    return (HXPhotoPreviewViewCell *)[self.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:self.currentModelIndex inSection:0]];
+}
 - (void)changeStatusBarWithHidden:(BOOL)hidden {
     self.statusBarShouldBeHidden = hidden;
-    [self performSelector:@selector(setNeedsStatusBarAppearanceUpdate)];
+//    [self preferredStatusBarUpdateAnimation];
 }
-
 - (void)setSubviewAlphaAnimate:(BOOL)animete duration:(NSTimeInterval)duration {
     if (self.exteriorPreviewStyle == HXPhotoViewPreViewShowStyleDark) {
         return;
     }
     BOOL hide = NO;
-    if (self.bottomView.alpha == 1) {
+    if (self.bottomCollectionView.alpha == 1) {
         hide = YES;
     }
     [self changeStatusBarWithHidden:hide];
@@ -824,7 +819,7 @@ HX_PhotoEditViewControllerDelegate
             self.view.backgroundColor = hide ? [UIColor blackColor] : bgColor;
             self.collectionView.backgroundColor = hide ? [UIColor blackColor] : bgColor;
             self.bottomView.alpha = hide ? 0 : 1;
-            self.bottomCollectionView.alpha = hide ? 0 : 1;
+            self.bottomCollectionView.alpha = hide ? 0 : 1;//sunwf
         } completion:^(BOOL finished) {
             if (hide) {
                 [self.navigationController setNavigationBarHidden:hide animated:NO];
@@ -842,7 +837,7 @@ HX_PhotoEditViewControllerDelegate
         self.view.backgroundColor = hide ? [UIColor blackColor] : bgColor;
         self.collectionView.backgroundColor = hide ? [UIColor blackColor] : bgColor;
         self.bottomView.alpha = hide ? 0 : 1;
-        self.bottomCollectionView.alpha = hide ? 0 : 1;
+        self.bottomCollectionView.alpha = hide ? 0 : 1;//sunwf
         if (hide) {
             [self.navigationController setNavigationBarHidden:hide];
         }
@@ -855,7 +850,6 @@ HX_PhotoEditViewControllerDelegate
     if (self.exteriorPreviewStyle == HXPhotoViewPreViewShowStyleDark) {
         self.darkDeleteView.alpha = alpha;
         self.darkCancelView.alpha = alpha;
-        self.moreBtn.alpha = alpha;
         self.bottomPageControl.alpha = alpha;
     }
 }
@@ -865,7 +859,11 @@ HX_PhotoEditViewControllerDelegate
     return [self.modelArray count];
 }
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
-    HXPhotoModel *model = self.modelArray[indexPath.item];
+    NSInteger index = indexPath.item;
+    if ([HXPhotoTools isRTLLanguage]) {
+        index = self.modelArray.count - 1 - indexPath.item;
+    }
+    HXPhotoModel *model = self.modelArray[index];
     HXPhotoPreviewViewCell *cell;
     HXWeakSelf
     if (model.subType == HXPhotoModelMediaSubTypePhoto) {
@@ -891,16 +889,11 @@ HX_PhotoEditViewControllerDelegate
     }else {
         cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"HXPhotoPreviewImageViewCell" forIndexPath:indexPath];
     }
+    cell.allowPreviewDirectLoadOriginalImage = self.manager.configuration.allowPreviewDirectLoadOriginalImage;
     cell.cellViewLongPressGestureRecognizerBlock = ^(UILongPressGestureRecognizer * _Nonnull longPress) {
         [weakSelf respondsToLongPress:longPress];
     };
-    cell.scrollViewDidScroll = ^(UIScrollView *scrollView) {
-        if (weakSelf.currentCellScrollViewDidScroll) {
-            weakSelf.currentCellScrollViewDidScroll(scrollView);
-        }
-    };
     [cell setCellDidPlayVideoBtn:^(BOOL play) {
-        [weakSelf requestImage];
         if (weakSelf.exteriorPreviewStyle == HXPhotoViewPreViewShowStyleDark) {
             return;
         }
@@ -970,27 +963,24 @@ HX_PhotoEditViewControllerDelegate
                 cell.bottomSliderView.hidden = hidden;
             }
             self.darkCancelView.hidden = hidden;
-            self.moreBtn.hidden = hidden;
             self.darkDeleteView.hidden = hidden;
         }
         [UIView animateWithDuration:0.25 animations:^{
-            cell.bottomSliderView.alpha = !hidden;
+            if (cell.previewContentView.videoView.playBtnDidPlay) {
+                cell.bottomSliderView.alpha = !hidden;
+            }
             self.darkCancelView.alpha = !hidden;
-            self.moreBtn.hidden = !hidden;
             self.darkDeleteView.alpha = !hidden;
         } completion:^(BOOL finished) {
             if (cell.previewContentView.videoView.playBtnDidPlay) {
                 cell.bottomSliderView.hidden = hidden;
             }
             self.darkCancelView.hidden = hidden;
-            self.moreBtn.hidden = hidden;
             self.darkDeleteView.hidden = hidden;
         }];
     }else {
         self.darkCancelView.alpha = !hidden;
-        self.moreBtn.alpha = !hidden;
         self.darkCancelView.hidden = hidden;
-        self.moreBtn.hidden = hidden;
         self.darkDeleteView.alpha = !hidden;
         self.darkDeleteView.hidden = hidden;
         if (cell.previewContentView.videoView.playBtnDidPlay) {
@@ -1038,31 +1028,29 @@ HX_PhotoEditViewControllerDelegate
             self.bottomView.enabled = self.manager.configuration.photoCanEdit;
         }
         UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
-        if (orientation == UIInterfaceOrientationPortrait || orientation == UIInterfaceOrientationPortraitUpsideDown) {
+        if (orientation == UIInterfaceOrientationPortrait || orientation == UIInterfaceOrientationPortraitUpsideDown || HX_UI_IS_IPAD) {
 //            self.titleLb.text = model.barTitle;
-//            self.subTitleLb.text = model.barSubTitle;
+//            self.subTitleLb.text = model.barSubTitle; //sunwf
         }else if (orientation == UIInterfaceOrientationLandscapeRight || orientation == UIInterfaceOrientationLandscapeLeft) {
-            self.subTitleLb.text = [NSString stringWithFormat:@"%@  %@",model.barTitle,model.barSubTitle];
+          //  self.subTitleLb.text = [NSString stringWithFormat:@"%@  %@",model.barTitle,model.barSubTitle];//sunwf
         }
         self.selectBtn.selected = model.selected;
         [self.selectBtn setTitle:model.selectIndexStr forState:UIControlStateSelected];
-        
-//        CGFloat selectTextWidth = [self.selectBtn.titleLabel hx_getTextWidth];
-//        if (selectTextWidth + 10 > 24 && self.selectBtn.selected) {
-//            self.selectBtn.hx_w = selectTextWidth + 10;
-//        }else {
-//            self.selectBtn.hx_w = 24;
-//        }
+        CGFloat selectTextWidth = [self.selectBtn.titleLabel hx_getTextWidth];
+        if (selectTextWidth + 10 > 24 && self.selectBtn.selected) {
+            self.selectBtn.hx_w = selectTextWidth + 10;
+        }else {
+            self.selectBtn.hx_w = 24;
+        }
         
         UIColor *themeColor = [HXPhotoCommon photoCommon].isDark ? self.manager.configuration.previewDarkSelectBgColor : self.manager.configuration.previewSelectedBtnBgColor;
         self.selectBtn.backgroundColor = self.selectBtn.selected ? themeColor : nil;
         if (self.outside) {
             if ([self.modelArray containsObject:model] && self.layoutSubviewsCompletion) {
                 self.bottomView.currentIndex = [self.modelArray indexOfObject:model];
-                self.bottomCollectionView.currentIndex = [self.modelArray indexOfObject:model];
+                self.bottomCollectionView.currentIndex =  [self.modelArray indexOfObject:model];
             }else {
                 [self.bottomView deselected];
-                [self.bottomCollectionView deselected];
             }
         }else {
             if (!self.manager.configuration.singleSelected) {
@@ -1080,7 +1068,6 @@ HX_PhotoEditViewControllerDelegate
                 self.bottomCollectionView.currentIndex = [[self.manager selectedArray] indexOfObject:model];
             }else {
                 [self.bottomView deselected];
-                [self.bottomCollectionView deselected];
             }
         }
     }
@@ -1124,12 +1111,6 @@ HX_PhotoEditViewControllerDelegate
         if (self.darkCancelView.alpha < 1) {
             self.darkCancelView.alpha = scale;
         }
-        
-        self.moreBtn.hidden = NO;
-        if (self.moreBtn.alpha < 1) {
-            self.moreBtn.alpha = scale;
-        }
-        
         if (nextModel.subType == HXPhotoModelMediaSubTypeVideo) {
             HXPhotoPreviewVideoViewCell *nextCell = (HXPhotoPreviewVideoViewCell *)[self.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:[self.modelArray indexOfObject:nextModel] inSection:0]];
             if (!nextCell.bottomSliderView.hidden || nextCell.bottomSliderView.alpha < 1) {
@@ -1325,7 +1306,7 @@ HX_PhotoEditViewControllerDelegate
     }
     if (self.manager.configuration.singleSelected) {
         if (model.subType == HXPhotoModelMediaSubTypeVideo) {
-            if (model.videoDuration >= self.manager.configuration.videoMaximumSelectDuration + 1) {
+            if (round(model.videoDuration) >= self.manager.configuration.videoMaximumSelectDuration + 1) {
                 if (self.manager.configuration.selectVideoBeyondTheLimitTimeAutoEdit &&
                     self.manager.configuration.videoCanEdit) {
                     self.singleSelectedJumpEdit = YES;
@@ -1334,7 +1315,7 @@ HX_PhotoEditViewControllerDelegate
                     [self.view hx_showImageHUDText:[NSString stringWithFormat:[NSBundle hx_localizedStringForKey:@"视频大于%ld秒，无法选择"], self.manager.configuration.videoMaximumSelectDuration]];
                 }
                 return;
-            }else if (model.videoDuration < self.manager.configuration.videoMinimumSelectDuration) {
+            }else if (round(model.videoDuration) < self.manager.configuration.videoMinimumSelectDuration) {
                 [self.view hx_showImageHUDText:[NSString stringWithFormat:[NSBundle hx_localizedStringForKey:@"视频少于%ld秒，无法选择"], self.manager.configuration.videoMinimumSelectDuration]];
                 return;
             }
@@ -1411,7 +1392,6 @@ HX_PhotoEditViewControllerDelegate
     [self.collectionView reloadData];
     if (self.outside) {
         [self.bottomView reloadData];
-        [self.bottomCollectionView reloadData];
         if ([self.delegate respondsToSelector:@selector(photoPreviewSelectLaterDidEditClick:beforeModel:afterModel:)]) {
             [self.delegate photoPreviewSelectLaterDidEditClick:self beforeModel:photoModel afterModel:photoModel];
         }
@@ -1422,13 +1402,12 @@ HX_PhotoEditViewControllerDelegate
                 [self.manager beforeSelectedListAddPhotoModel:photoModel];
                 self.selectBtn.selected = YES;
                 [self.selectBtn setTitle:photoModel.selectIndexStr forState:UIControlStateSelected];
-                
-//                CGFloat selectTextWidth = [self.selectBtn.titleLabel hx_getTextWidth];
-//                if (selectTextWidth + 10 > 24 && self.selectBtn.selected) {
-//                    self.selectBtn.hx_w = selectTextWidth + 10;
-//                }else {
-//                    self.selectBtn.hx_w = 24;
-//                }
+                CGFloat selectTextWidth = [self.selectBtn.titleLabel hx_getTextWidth];
+                if (selectTextWidth + 10 > 24 && self.selectBtn.selected) {
+                    self.selectBtn.hx_w = selectTextWidth + 10;
+                }else {
+                    self.selectBtn.hx_w = 24;
+                }
                 UIColor *btnBgColor = self.manager.configuration.previewSelectedBtnBgColor ?: self.manager.configuration.themeColor;
                 UIColor *themeColor = [HXPhotoCommon photoCommon].isDark ? [UIColor whiteColor] : btnBgColor;
                 self.selectBtn.backgroundColor = themeColor;
@@ -1437,13 +1416,9 @@ HX_PhotoEditViewControllerDelegate
                 }
                 self.bottomView.selectCount = [self.manager selectedCount];
                 [self.bottomView insertModel:photoModel];
-                
-                self.bottomCollectionView.selectCount = [self.manager selectedCount];
-                [self.bottomCollectionView insertModel:photoModel];
             }
         }else {
             [self.bottomView reloadData];
-            [self.bottomCollectionView reloadData];
         }
         if ([self.delegate respondsToSelector:@selector(photoPreviewDidEditClick:model:beforeModel:)]) {
             [self.delegate photoPreviewDidEditClick:self model:photoModel beforeModel:photoModel];
@@ -1466,7 +1441,6 @@ HX_PhotoEditViewControllerDelegate
     if (beforeModel.selected) {
         [self.manager beforeSelectedListdeletePhotoModel:beforeModel];
         [self.bottomView deleteModel:beforeModel];
-        [self.bottomCollectionView deleteModel:beforeModel];
     }
     [self.manager beforeListAddCameraPhotoModel:afterModel];
     
@@ -1476,9 +1450,6 @@ HX_PhotoEditViewControllerDelegate
             [self.manager beforeSelectedListAddPhotoModel:afterModel];
             self.bottomView.selectCount = [self.manager selectedCount];
             [self.bottomView insertModel:afterModel];
-            
-            self.bottomCollectionView.selectCount = [self.manager selectedCount];
-            [self.bottomCollectionView insertModel:afterModel];
         }
     }else {
         if (afterModel.subType == HXPhotoModelMediaSubTypeVideo) {
@@ -1573,8 +1544,8 @@ HX_PhotoEditViewControllerDelegate
 - (UIView *)darkCancelView {
     if (!_darkCancelView) {
         _darkCancelView = [[UIView alloc] init];
-//        UIVisualEffectView *effectView = [self creatBlurEffectView];
-//        [_darkCancelView addSubview:effectView];
+        UIVisualEffectView *effectView = [self creatBlurEffectView];
+        [_darkCancelView addSubview:effectView];
         [_darkCancelView addSubview:self.darkCancelBtn];
     }
     return _darkCancelView;
@@ -1582,23 +1553,12 @@ HX_PhotoEditViewControllerDelegate
 - (UIButton *)darkCancelBtn {
     if (!_darkCancelBtn) {
         _darkCancelBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-        [_darkCancelBtn setImage:[UIImage hx_imageNamed:@"whiteback"] forState:UIControlStateNormal];
+        [_darkCancelBtn setImage:[UIImage hx_imageNamed:@"hx_preview_dark_close"] forState:UIControlStateNormal];
         [_darkCancelBtn addTarget:self action:@selector(cancelDismissClick) forControlEvents:UIControlEventTouchUpInside];
         _darkCancelBtn.frame = CGRectMake(0, 0, HXDARKVIEWWIDTH, HXDARKVIEWWIDTH);
     }
     return _darkCancelBtn;
 }
-
-- (UIButton *)moreBtn {
-    if (!_moreBtn) {
-        _moreBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-        [_moreBtn setImage:[UIImage imageNamed:@"icon图片列表"] forState:UIControlStateNormal];
-        [_moreBtn addTarget:self action:@selector(moreClick:) forControlEvents:UIControlEventTouchUpInside];
-        _moreBtn.frame = CGRectMake(0, 0, HXMOREBTNWIDTH, HXMOREBTNWIDTH);
-    }
-    return _moreBtn;
-}
-
 - (UIButton *)darkDeleteBtn {
     if (!_darkDeleteBtn) {
         _darkDeleteBtn = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -1685,7 +1645,7 @@ HX_PhotoEditViewControllerDelegate
         _bottomCollectionView.delegate = self;
     }
     return _bottomCollectionView;
-}
+} //sunwf
 
 - (UIButton *)selectBtn {
     if (!_selectBtn) {
