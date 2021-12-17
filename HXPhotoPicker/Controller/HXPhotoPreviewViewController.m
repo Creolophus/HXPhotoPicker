@@ -1107,7 +1107,7 @@ HX_PhotoEditViewControllerDelegate
                 self.darkDeleteView.alpha = scale;
             }
         }
-        self.darkCancelView.hidden = NO;
+        self.darkCancelView.hidden = YES;// sunwf
         if (self.darkCancelView.alpha < 1) {
             self.darkCancelView.alpha = scale;
         }
@@ -1547,6 +1547,7 @@ HX_PhotoEditViewControllerDelegate
         UIVisualEffectView *effectView = [self creatBlurEffectView];
         [_darkCancelView addSubview:effectView];
         [_darkCancelView addSubview:self.darkCancelBtn];
+        _darkCancelView.hidden = YES;// sunwf
     }
     return _darkCancelView;
 }
