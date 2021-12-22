@@ -126,6 +126,7 @@ HXCustomCameraController;
 @property (strong, nonatomic) UIFont *textFont;
 
 - (void)config;
+- (void)adjustMoreIconSizeWithRowCount:(int)rowCount;
 @end
 
 @interface HXPhotoViewSectionFooterView : UICollectionReusableView
