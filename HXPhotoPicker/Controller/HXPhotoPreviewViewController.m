@@ -592,7 +592,7 @@ HX_PhotoEditViewControllerDelegate
         //self.selectBtn.hx_size = CGSizeMake(20, 20);
         if (model.selectIndexStr.length > 0) {
             self.bottomCollectionView.currentIndex = [model.selectIndexStr intValue] - 1;
-        } //sunwf
+        }//sunwf
 
 //        CGFloat selectTextWidth = [self.selectBtn.titleLabel hx_getTextWidth];
 //        if (selectTextWidth + 10 > 24 && self.selectBtn.selected) {
@@ -1073,7 +1073,12 @@ HX_PhotoEditViewControllerDelegate
         
         if (model.selectIndexStr.length > 0) {
             self.bottomCollectionView.currentIndex = [model.selectIndexStr intValue] - 1;
-        } //sunwf
+        }else {
+            if (self.bottomCollectionView.currentIndex >= 0 ){
+                [self.bottomCollectionView deselectedWithIndex:self.bottomCollectionView.currentIndex];
+            }
+        }
+        //sunwf
 
 //        CGFloat selectTextWidth = [self.selectBtn.titleLabel hx_getTextWidth];
 //        if (selectTextWidth + 10 > 24 && self.selectBtn.selected) {

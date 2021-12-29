@@ -124,9 +124,9 @@ HXCustomCameraController;
 @property (strong, nonatomic) UIColor *textColor;
 @property (strong, nonatomic) UIColor *textDarkColor;
 @property (strong, nonatomic) UIFont *textFont;
+@property (assign, nonatomic) int rowCount;
 
 - (void)config;
-- (void)adjustMoreIconSizeWithRowCount:(int)rowCount;
 @end
 
 @interface HXPhotoViewSectionFooterView : UICollectionReusableView
