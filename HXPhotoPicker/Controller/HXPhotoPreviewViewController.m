@@ -253,6 +253,7 @@ HX_PhotoEditViewControllerDelegate
     if (self.manager.viewDidAppear) {
         self.manager.viewDidAppear(self);
     }
+    [self scrollViewDidScroll:self.collectionView];//sunwf
 }
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
