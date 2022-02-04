@@ -94,7 +94,7 @@
     self.videoAutoPlayType = HXVideoAutoPlayTypeOnce;
     self.previewSelectedBtnBgColor = self.themeColor;
     self.changeOriginalTinColor = YES;
-    self.downloadNetworkVideo = YES;
+    self.downloadNetworkVideo = NO;
     self.cameraCanLocation = YES;
     self.editAssetSaveSystemAblum = NO;
     self.photoEditCustomRatios = @[@{@"原始值" : @"{0, 0}"}, @{@"正方形" : @"{1, 1}"}, @{@"2:3" : @"{2, 3}"}, @{@"3:4" : @"{3, 4}"}, @{@"9:16" : @"{9, 16}"}, @{@"16:9" : @"{16, 9}"}];
