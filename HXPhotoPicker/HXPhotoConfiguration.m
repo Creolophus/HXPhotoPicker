@@ -48,7 +48,7 @@
     self.popTransitionDuration = 0.35f;
     self.popInteractiveTransitionDuration = 0.45f;
     self.doneBtnShowDetail = YES;
-    self.videoCanEdit = YES;
+    self.videoCanEdit = NO;
     self.photoCanEdit = NO;
     self.localFileName = @"HXPhotoPickerModelArray";
     self.languageType = HXPhotoLanguageTypeSys;
