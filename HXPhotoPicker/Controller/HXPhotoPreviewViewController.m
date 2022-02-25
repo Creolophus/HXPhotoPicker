@@ -414,6 +414,7 @@ HX_PhotoEditViewControllerDelegate
             }
             self.darkCancelView.frame = CGRectMake(0, topMargin, HXDARKVIEWWIDTH, HXDARKVIEWWIDTH);
             self.moreBtn.frame = CGRectMake(self.view.frame.size.width-HXMOREBTNWIDTH, topMargin, HXMOREBTNWIDTH, HXMOREBTNWIDTH);//sunwf-n
+            self.darkCancelView.hx_centerY = self.moreBtn.hx_centerY;
             
             CGFloat pageControlY = HX_IS_IPhoneX_All ? self.view.hx_h - 40 : self.view.hx_h - 30;
             self.bottomPageControl.frame = CGRectMake(0, pageControlY, self.view.hx_w, 10);
@@ -1607,7 +1608,7 @@ HX_PhotoEditViewControllerDelegate
     if (!_darkCancelView) {
         _darkCancelView = [[UIView alloc] init];
         UIVisualEffectView *effectView = [self creatBlurEffectView];
-        [_darkCancelView addSubview:effectView];
+        //[_darkCancelView addSubview:effectView];
         [_darkCancelView addSubview:self.darkCancelBtn];
     }
     _darkCancelView.hidden = YES;//sunwf
@@ -1616,8 +1617,13 @@ HX_PhotoEditViewControllerDelegate
 - (UIButton *)darkCancelBtn {
     if (!_darkCancelBtn) {
         _darkCancelBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-        [_darkCancelBtn setImage:[UIImage hx_imageNamed:@"hx_preview_dark_close"] forState:UIControlStateNormal];
+       // [_darkCancelBtn setImage:[UIImage hx_imageNamed:@"hx_preview_dark_close"] forState:UIControlStateNormal];
+       UIImage * backImage = [[UIImage hx_imageNamed:@"hx_nav_back"] imageWithRenderingMode:(UIImageRenderingModeAlwaysTemplate)];
+        [_darkCancelBtn setImage:backImage forState:UIControlStateNormal];
         [_darkCancelBtn addTarget:self action:@selector(cancelDismissClick) forControlEvents:UIControlEventTouchUpInside];
+        if (self.exteriorPreviewStyle == HXPhotoViewPreViewShowStyleDark) {
+            _darkCancelBtn.imageView.tintColor = [UIColor whiteColor];
+        }
         _darkCancelBtn.frame = CGRectMake(0, 0, HXDARKVIEWWIDTH, HXDARKVIEWWIDTH);
     }
     return _darkCancelBtn;
