@@ -205,10 +205,10 @@
                               showBottomPageControl:(BOOL)showBottomPageControl
                                        currentIndex:(NSUInteger)currentIndex
                                           photoView:(HXPhotoView * _Nullable)photoView
-                                    hiddenRightBtn:(NSString * _Nullable)ishidden{
+                                        showMoreBtn:(BOOL)showMoreBtn{
     
     HXPhotoPreviewViewController *vc = [[HXPhotoPreviewViewController alloc] init];
-    vc.ishidden = ishidden;
+    vc.showMoreButton = showMoreBtn;
     vc.disableaPersentInteractiveTransition = photoView.disableaInteractiveTransition;
     vc.outside = YES;
     vc.manager = manager ?: photoView.manager;
@@ -234,7 +234,11 @@
     vc.modalPresentationStyle = UIModalPresentationOverFullScreen;
     vc.modalPresentationCapturesStatusBarAppearance = YES;
     
-    [self presentViewController:vc animated:YES completion:nil];
+    LUINavigationController_OC *nvc = [[LUINavigationController_OC alloc] initWithRootViewController:vc];
+    nvc.modalPresentationStyle = UIModalPresentationOverFullScreen;
+    nvc.modalPresentationCapturesStatusBarAppearance = YES;
+    nvc.navigationBar.hidden = YES;
+    [self presentViewController:nvc animated:YES completion:nil];
 }
 
 - (void)hx_presentPhotoEditViewControllerWithManager:(HXPhotoManager * _Nonnull)manager

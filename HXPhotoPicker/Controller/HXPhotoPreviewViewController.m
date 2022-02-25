@@ -629,11 +629,10 @@ HX_PhotoEditViewControllerDelegate
             self.darkDeleteView.hidden = NO;
             [self.view addSubview:self.darkCancelView];
 
-
-            /// 看不懂在这里写这个干什么
-//            if (![self.ishidden isEqualToString:@"hidden"]){
-//                [self.view addSubview:self.moreBtn];
-//            } //sunwf
+            /// 显示更多按钮
+            if (self.showMoreButton){
+                [self.view addSubview:self.moreBtn];
+            } //sunwf
             
             if (self.previewShowDeleteButton) {
                 [self.view addSubview:self.darkDeleteView];

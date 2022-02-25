@@ -99,7 +99,7 @@ HXPhotoPreviewViewCell;
 @property (strong, nonatomic) HXPhotoPreviewBottomView *bottomView;
 @property (strong, nonatomic) HXPhotoPreviewBottomCollectionView *bottomCollectionView;//sunwf
 @property (strong, nonatomic) HXPhotoView *photoView;
-@property (assign, nonatomic) NSString *ishidden;//sunwf
+@property (assign, nonatomic) BOOL showMoreButton;//sunwf
 /// 停止取消
 @property (assign, nonatomic) BOOL stopCancel;
 /// 预览时显示删除按钮
