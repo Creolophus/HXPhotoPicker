@@ -414,7 +414,7 @@ HX_PhotoEditViewControllerDelegate
             }
             self.darkCancelView.frame = CGRectMake(0, topMargin, HXDARKVIEWWIDTH, HXDARKVIEWWIDTH);
             self.moreBtn.frame = CGRectMake(self.view.frame.size.width-HXMOREBTNWIDTH, topMargin, HXMOREBTNWIDTH, HXMOREBTNWIDTH);//sunwf-n
-            self.darkCancelView.hx_centerY = self.moreBtn.hx_centerY;
+            self.darkCancelView.hx_centerY = self.moreBtn.hx_centerY - 5;
             
             CGFloat pageControlY = HX_IS_IPhoneX_All ? self.view.hx_h - 40 : self.view.hx_h - 30;
             self.bottomPageControl.frame = CGRectMake(0, pageControlY, self.view.hx_w, 10);
@@ -1611,7 +1611,6 @@ HX_PhotoEditViewControllerDelegate
         //[_darkCancelView addSubview:effectView];
         [_darkCancelView addSubview:self.darkCancelBtn];
     }
-    _darkCancelView.hidden = YES;//sunwf
     return _darkCancelView;
 }
 - (UIButton *)darkCancelBtn {
