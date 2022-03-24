@@ -1932,9 +1932,10 @@ HX_PhotoEditViewControllerDelegate
         HXWeakSelf
         __block NSInteger videoCount = videoArray.count;
         __block NSInteger videoIndex = 0;
-        BOOL endOriginal = self.manager.configuration.exportVideoURLForHighestQuality ? requestOriginal : NO;
+//        BOOL endOriginal = self.manager.configuration.exportVideoURLForHighestQuality ? requestOriginal : NO;
         for (HXPhotoModel *pm in videoArray) {
-            [pm exportVideoWithPresetName:endOriginal ? AVAssetExportPresetHighestQuality : AVAssetExportPresetMediumQuality startRequestICloud:nil iCloudProgressHandler:nil exportProgressHandler:nil success:^(NSURL * _Nullable videoURL, HXPhotoModel * _Nullable model) {
+            // 解决发布视频模糊问题
+            [pm exportVideoWithPresetName:AVAssetExportPreset1920x1080 startRequestICloud:nil iCloudProgressHandler:nil exportProgressHandler:nil success:^(NSURL * _Nullable videoURL, HXPhotoModel * _Nullable model) {
                 if (!weakSelf) {
                     return;
                 }
