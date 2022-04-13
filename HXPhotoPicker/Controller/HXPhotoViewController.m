@@ -1260,6 +1260,7 @@ HX_PhotoEditViewControllerDelegate
     if (model.type == HXPhotoModelMediaTypeCamera) {
         HXPhotoCameraViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"HXPhotoCameraViewCellId" forIndexPath:indexPath];
         cell.bgColor = self.manager.configuration.photoListTakePhotoBgColor;
+        cell.bgColor = self.manager.configuration.photoListLimitCellBackgroundColor;
         cell.model = model;
         if (!self.cameraCell) {
             cell.cameraImage = [HXPhotoCommon photoCommon].cameraImage;
@@ -2353,6 +2354,7 @@ HX_PhotoEditViewControllerDelegate
     return self;
 }
 - (void)setupUI  {
+    self.backgroundColor = self.bgColor;
     self.startSession = NO;
     [self.contentView addSubview:self.previewView];
     [self.contentView addSubview:self.cameraBtn];
@@ -2463,6 +2465,18 @@ HX_PhotoEditViewControllerDelegate
     }
     [self.cameraBtn setImage:model.thumbPhoto forState:UIControlStateNormal];
     [self.cameraBtn setImage:model.previewPhoto forState:UIControlStateSelected];
+    [self.cameraBtn setTitle:@"拍摄" forState:UIControlStateNormal];
+    [self.cameraBtn setTitleColor:[UIColor hx_colorWithHexStr:@"#A8ABB3"] forState:UIControlStateNormal];
+    self.cameraBtn.titleLabel.font = [UIFont fontWithName:@"PingFang-SC-Regular" size:12];
+   
+    CGSize titleSize = [self.cameraBtn.titleLabel sizeThatFits:CGSizeZero];
+    CGSize imageSize = self.cameraBtn.imageView.image.size;
+    imageSize = CGSizeMake(imageSize.width, imageSize.height-30);
+    CGFloat space = 15;
+    
+    self.cameraBtn.titleEdgeInsets = UIEdgeInsetsMake((titleSize.height+space)*0.5, -(imageSize.width*0.5), -(titleSize.height + space)*0.5, imageSize.width*0.5);
+    self.cameraBtn.imageEdgeInsets = UIEdgeInsetsMake(-(imageSize.height + space)*0.5, titleSize.width*0.5, (imageSize.height + space)*0.5, -(titleSize.width*0.5));
+    
 }
 - (void)layoutSubviews {
     [super layoutSubviews];
@@ -2595,12 +2609,12 @@ HX_PhotoEditViewControllerDelegate
     if (_rowCount == 3) {
         self.textLb.frame = CGRectMake(0, self.hx_centerY+10 , self.hx_w, [self.textLb hx_getTextHeight]);
         self.moreIcon.frame = CGRectMake(0, 0, 45, 45);
-        self.moreIcon.hx_centerX = self.hx_centerX;
+        self.moreIcon.hx_centerX = self.textLb.hx_centerX;
         self.moreIcon.hx_y = self.hx_centerY - 37;
     }else {
         self.textLb.frame = CGRectMake(0, self.hx_centerY+7 , self.hx_w, [self.textLb hx_getTextHeight]);
         self.moreIcon.frame = CGRectMake(0, 0, 32, 32);
-        self.moreIcon.hx_centerX = self.hx_centerX;
+        self.moreIcon.hx_centerX = self.textLb.hx_centerX;
         self.moreIcon.hx_y = self.hx_centerY - 30;
     }
 }
