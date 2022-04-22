@@ -2467,6 +2467,7 @@ HX_PhotoEditViewControllerDelegate
     [self.cameraBtn setImage:model.previewPhoto forState:UIControlStateSelected];
     [self.cameraBtn setTitle:@"拍摄" forState:UIControlStateNormal];
     [self.cameraBtn setTitleColor:[UIColor hx_colorWithHexStr:@"#A8ABB3"] forState:UIControlStateNormal];
+    [self.cameraBtn setTitleColor:[UIColor hx_colorWithHexStr:@"#A8ABB3"] forState:UIControlStateSelected];
     self.cameraBtn.titleLabel.font = [UIFont fontWithName:@"PingFang-SC-Regular" size:12];
    
     CGSize titleSize = [self.cameraBtn.titleLabel sizeThatFits:CGSizeZero];

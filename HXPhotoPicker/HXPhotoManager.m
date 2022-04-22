@@ -699,11 +699,13 @@
         }else {
             if (self.configuration.type == HXConfigurationTypeWXChat ||
                 self.configuration.type == HXConfigurationTypeWXMoment) {
-                    model.cameraNormalImageNamed = @"hx_takePhoto";
-                    model.cameraPreviewImageNamed = @"hx_takePhoto";
+                   // model.cameraNormalImageNamed = @"hx_takePhoto";
+                   // model.cameraPreviewImageNamed = @"hx_takePhoto";
+                model.cameraNormalImageNamed = @"hx_compose_photo_photograph";
+                model.cameraPreviewImageNamed = @"hx_compose_photo_photograph";
             }else {
                 model.cameraNormalImageNamed = @"hx_compose_photo_photograph";
-                model.cameraPreviewImageNamed = @"hx_takePhoto";
+                model.cameraPreviewImageNamed = @"hx_compose_photo_photograph";
             }
         }
         if (!self.configuration.reverseDate) {

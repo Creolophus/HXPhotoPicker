@@ -39,7 +39,7 @@
     self.videoMinimumDuration = 3.f;
     self.previewBottomSelectBorderWidth = 3.0f;
     if ([UIScreen mainScreen].bounds.size.width != 320 && [UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone) {
-        self.cameraCellShowPreview = YES;
+        self.cameraCellShowPreview = NO;
     }
     self.customAlbumName = [NSBundle mainBundle].infoDictionary[(NSString *)kCFBundleNameKey];
     self.horizontalRowCount = 6;
