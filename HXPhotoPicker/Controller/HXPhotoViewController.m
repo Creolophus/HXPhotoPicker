@@ -2472,7 +2472,7 @@ HX_PhotoEditViewControllerDelegate
    
     CGSize titleSize = [self.cameraBtn.titleLabel sizeThatFits:CGSizeZero];
     CGSize imageSize = self.cameraBtn.imageView.image.size;
-    imageSize = CGSizeMake(imageSize.width, imageSize.height-31);
+    imageSize = CGSizeMake(imageSize.width, imageSize.height-23);
     CGFloat space = 16;
     
     self.cameraBtn.titleEdgeInsets = UIEdgeInsetsMake((titleSize.height+space)*0.5, -(imageSize.width*0.5), -(titleSize.height + space)*0.5, imageSize.width*0.5);
