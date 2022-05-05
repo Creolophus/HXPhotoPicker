@@ -961,10 +961,25 @@
         if (success) success(self.photoEdit.editPreviewData, self.photoEdit.editPreviewImage.imageOrientation, self, nil);
         return 0;
     }
+    // 本地图片使用hxmodel initWithImage 创建
+    if (self.asset == nil && self.type == HXPhotoModelMediaTypeCameraPhoto && self.networkPhotoUrl == nil && self.thumbPhoto) {
+        NSData *data = UIImageJPEGRepresentation(self.thumbPhoto, 1);
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (success && data) {
+                success(data, 0, self, nil);
+            }else if (failed) {
+                failed(nil, self);
+            }
+        });
+        return 0;
+    }
     HXWeakSelf
     if (self.type == HXPhotoModelMediaTypeCameraPhoto && self.networkPhotoUrl) {
 #if HasSDWebImage
         [[SDWebImageManager sharedManager] loadImageWithURL:self.networkPhotoUrl options:0 progress:nil completed:^(UIImage * _Nullable image, NSData * _Nullable data, NSError * _Nullable error, SDImageCacheType cacheType, BOOL finished, NSURL * _Nullable imageURL) {
+            if (!data && image) {
+                data = UIImageJPEGRepresentation(image, 1);
+            }
             if (data) {
                 dispatch_async(dispatch_get_main_queue(), ^{
                     if (success) {
