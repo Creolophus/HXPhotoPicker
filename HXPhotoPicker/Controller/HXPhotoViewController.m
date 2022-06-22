@@ -3565,9 +3565,11 @@ if (self.originalBtn.selected) {
 - (void)updateOriginalBtnFrame {
 if (self.editBtn.hidden) {
     self.originalBtn.frame = CGRectMake(CGRectGetMaxX(self.previewBtn.frame) + 10, 0, 30, 50);
+    self.originalBtn.hx_centerY = self.previewBtn.hx_centerY;
     
 }else {
     self.originalBtn.frame = CGRectMake(CGRectGetMaxX(self.editBtn.frame) + 10, 0, 30, 50);
+    self.originalBtn.hx_centerY = self.editBtn.hx_centerY;
 }
 self.originalBtn.hx_w = self.originalBtn.titleLabel.hx_getTextWidth + 30;
 if (CGRectGetMaxX(self.originalBtn.frame) > self.doneBtn.hx_x - 25) {
