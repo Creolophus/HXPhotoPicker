@@ -377,7 +377,7 @@ NSString *const hx_kKeyContentIdentifier = @"com.apple.quicktime.content.identif
     if (dataLength >= 0.5 * (1024 * 1024)) {
         bytes = [NSString stringWithFormat:@"%0.1fM",dataLength/1024/1024.0];
     } else if (dataLength >= 1024) {
-        bytes = [NSString stringWithFormat:@"%0.0fK",dataLength/1024.0];
+        bytes = [NSString stringWithFormat:@"%0.0fKB",dataLength/1024.0];
     } else {
         bytes = [NSString stringWithFormat:@"%zdB",dataLength];
     }

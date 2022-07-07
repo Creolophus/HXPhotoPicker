@@ -262,8 +262,9 @@
             }
         }
     }
+    self.editBtn.hx_x = 16;
+    self.editBtn.hx_centerY = self.doneBtn.hx_centerY;
     self.tipView.frame = self.collectionView.frame;
-    
     self.tipLb.frame = CGRectMake(12, 0, self.tipView.hx_w - 12, self.tipView.hx_h);
 }
 - (void)layoutSubviews {
@@ -375,7 +376,7 @@
     if (!_editBtn) {
         _editBtn = [UIButton buttonWithType:UIButtonTypeCustom];
         [_editBtn setTitle:[NSBundle hx_localizedStringForKey:@"编辑"] forState:UIControlStateNormal];
-        _editBtn.titleLabel.font = [UIFont systemFontOfSize:16];
+        _editBtn.titleLabel.font = [UIFont hx_pingFangFontOfSize:14];
         [_editBtn addTarget:self action:@selector(didEditBtnClick) forControlEvents:UIControlEventTouchUpInside];
         _editBtn.hx_size = CGSizeMake(50, 50);
     }

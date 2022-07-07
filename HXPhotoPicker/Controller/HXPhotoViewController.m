@@ -3393,6 +3393,7 @@ return self;
 [self.bgView setHidden:YES];
 [self addSubview:self.previewBtn];
 [self addSubview:self.originalBtn];
+[self addSubview:self.originalBytesLab];
 [self addSubview:self.doneBtn];
 [self addSubview:self.editBtn];
 [self.editBtn setHidden:YES];
@@ -3425,7 +3426,7 @@ return self;
         self.bgView.barTintColor = [UIColor blackColor];
     }else {
         self.bgView.barTintColor = self.barTintColor;
-        themeColor = [UIColor hx_colorWithHexStr:@"#363C54"];
+        themeColor = [UIColor hx_colorWithHexStr:@"#232934"];
         if (self.manager.configuration.originalBtnImageTintColor) {
             originalBtnImageTintColor = self.manager.configuration.originalBtnImageTintColor;
         }else {
@@ -3439,20 +3440,21 @@ return self;
     }
     
     [self.previewBtn setTitleColor:themeColor forState:UIControlStateNormal];
-    [self.previewBtn setTitleColor:[themeColor colorWithAlphaComponent:0.5] forState:UIControlStateDisabled];
+    [self.previewBtn setTitleColor:[UIColor hx_colorWithHexStr:@"#7B7E85"] forState:UIControlStateDisabled];
     
     [self.originalBtn setTitleColor:themeColor forState:UIControlStateNormal];
     [self.originalBtn setTitleColor:[themeColor colorWithAlphaComponent:0.5] forState:UIControlStateDisabled];
     
     UIImageRenderingMode rederingMode = self.manager.configuration.changeOriginalTinColor ? UIImageRenderingModeAlwaysTemplate : UIImageRenderingModeAlwaysOriginal;
     UIImage *originalNormalImage = [[UIImage hx_imageNamed:self.manager.configuration.originalNormalImageName] imageWithRenderingMode:rederingMode];
-    UIImage *originalSelectedImage = [[UIImage hx_imageNamed:self.manager.configuration.originalSelectedImageName] imageWithRenderingMode:rederingMode];
+    originalNormalImage = [originalNormalImage hx_scaleToFitSize:CGSizeMake(18, 18)];
+    UIImage *originalSelectedImage = [[UIImage hx_imageNamed:self.manager.configuration.originalSelectedImageName] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
     [self.originalBtn setImage:originalNormalImage forState:UIControlStateNormal];
     [self.originalBtn setImage:originalSelectedImage forState:UIControlStateSelected];
     self.originalBtn.imageView.tintColor = originalBtnImageTintColor;
     
     [self.editBtn setTitleColor:themeColor forState:UIControlStateNormal];
-    [self.editBtn setTitleColor:[themeColor colorWithAlphaComponent:0.5] forState:UIControlStateDisabled];
+    [self.editBtn setTitleColor:[UIColor hx_colorWithHexStr:@"#7B7E85"]  forState:UIControlStateDisabled];
     
 //    if ([themeColor isEqual:[UIColor whiteColor]]) {
 //        [self.doneBtn setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
@@ -3536,9 +3538,11 @@ if (self.originalBtn.selected) {
             [weakSelf updateLoadingViewWithHidden:YES];
         }
         if (totalDataLengths > 0) {
-            [weakSelf.originalBtn setTitle:[NSString stringWithFormat:@"%@(%@)",[NSBundle hx_localizedStringForKey:@"原图"], totalBytes] forState:UIControlStateNormal];
+           // [weakSelf.originalBtn setTitle:[NSString stringWithFormat:@"%@(%@)",[NSBundle hx_localizedStringForKey:@"原图"], totalBytes] forState:UIControlStateNormal];
+            weakSelf.originalBytesLab.text = [NSString stringWithFormat:@"共 %@",totalBytes];
         }else {
             [weakSelf.originalBtn setTitle:[NSBundle hx_localizedStringForKey:@"原图"] forState:UIControlStateNormal];
+            weakSelf.originalBytesLab.text = @"";
         }
         [weakSelf updateOriginalBtnFrame];
     }];
@@ -3552,6 +3556,7 @@ if (self.originalBtn.selected) {
 - (void)resetOriginalBtn {
 [self.manager.dataOperationQueue cancelAllOperations];
 [self.originalBtn setTitle:[NSBundle hx_localizedStringForKey:@"原图"] forState:UIControlStateNormal];
+self.originalBytesLab.text = @"";
 [self updateOriginalBtnFrame];
 }
 - (void)changeDoneBtnFrame {
@@ -3564,11 +3569,10 @@ if (self.originalBtn.selected) {
 }
 - (void)updateOriginalBtnFrame {
 if (self.editBtn.hidden) {
-    self.originalBtn.frame = CGRectMake(CGRectGetMaxX(self.previewBtn.frame) + 10, 0, 30, 50);
+    self.originalBtn.frame = CGRectMake(CGRectGetMaxX(self.previewBtn.frame) + 30, 0, 30, 50);
     self.originalBtn.hx_centerY = self.previewBtn.hx_centerY;
-    
 }else {
-    self.originalBtn.frame = CGRectMake(CGRectGetMaxX(self.editBtn.frame) + 10, 0, 30, 50);
+    self.originalBtn.frame = CGRectMake(CGRectGetMaxX(self.editBtn.frame) + 30, 0, 30, 50);
     self.originalBtn.hx_centerY = self.editBtn.hx_centerY;
 }
 self.originalBtn.hx_w = self.originalBtn.titleLabel.hx_getTextWidth + 30;
@@ -3576,6 +3580,7 @@ if (CGRectGetMaxX(self.originalBtn.frame) > self.doneBtn.hx_x - 25) {
     CGFloat w = self.doneBtn.hx_x - 5 - self.originalBtn.hx_x;
     self.originalBtn.hx_w = w < 0 ? 30 : w;
 }
+self.originalBytesLab.frame = CGRectMake(CGRectGetMinX(self.originalBtn.frame) + 4, CGRectGetMinY(self.originalBtn.frame) + 32, 100, 20);
 
 self.originalBtn.titleEdgeInsets = UIEdgeInsetsMake(0, 5 , 0, 0);
 }
@@ -3624,6 +3629,7 @@ self.previewBtn.hx_w = self.previewBtn.titleLabel.hx_getTextWidth;
 
 self.editBtn.frame = CGRectMake(CGRectGetMaxX(self.previewBtn.frame) + 10, 0, 0, 50);
 self.editBtn.hx_w = self.editBtn.titleLabel.hx_getTextWidth;
+self.editBtn.hx_centerY = self.previewBtn.hx_centerY;
 
 self.doneBtn.frame = CGRectMake(HX_ScreenWidth-(16)-HX_Width(290), HX_Height(30), HX_Width(290), HX_Height(90));
 [self changeDoneBtnFrame];
@@ -3641,7 +3647,7 @@ if (!_previewBtn) {
     _previewBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     [_previewBtn setTitle:[NSBundle hx_localizedStringForKey:@"预览"] forState:UIControlStateNormal];
     [_previewBtn setTitleColor:[UIColor hx_colorWithHexStr:@"#363C54"] forState:UIControlStateNormal];
-    _previewBtn.titleLabel.font = [UIFont hx_mediumPingFangOfSize:18];
+    _previewBtn.titleLabel.font = [UIFont hx_pingFangFontOfSize:14];
     _previewBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentLeft;
     [_previewBtn addTarget:self action:@selector(didPreviewClick) forControlEvents:UIControlEventTouchUpInside];
     _previewBtn.enabled = NO;
@@ -3665,16 +3671,26 @@ if (!_originalBtn) {
     _originalBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     [_originalBtn setTitle:[NSBundle hx_localizedStringForKey:@"原图"] forState:UIControlStateNormal];
     [_originalBtn addTarget:self action:@selector(didOriginalClick:) forControlEvents:UIControlEventTouchUpInside];
-    _originalBtn.titleLabel.font = [UIFont systemFontOfSize:16];
+    _originalBtn.titleLabel.font = [UIFont hx_pingFangFontOfSize:14];
     _originalBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentLeft;
 }
 return _originalBtn;
 }
+    
+- (UILabel*)originalBytesLab {
+    if (!_originalBytesLab) {
+        _originalBytesLab = [[UILabel alloc]init];
+        _originalBytesLab.textColor = [UIColor hx_colorWithHexStr:@"#7B7E85"];
+        _originalBytesLab.font = [UIFont hx_pingFangFontOfSize:10];
+    }
+    return  _originalBytesLab;
+}
+    
 - (UIButton *)editBtn {
 if (!_editBtn) {
     _editBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     [_editBtn setTitle:[NSBundle hx_localizedStringForKey:@"编辑"] forState:UIControlStateNormal];
-    _editBtn.titleLabel.font = [UIFont systemFontOfSize:16];
+    _editBtn.titleLabel.font = [UIFont hx_pingFangFontOfSize:14];
     _editBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentLeft;
     [_editBtn addTarget:self action:@selector(didEditBtnClick) forControlEvents:UIControlEventTouchUpInside];
     _editBtn.enabled = NO;

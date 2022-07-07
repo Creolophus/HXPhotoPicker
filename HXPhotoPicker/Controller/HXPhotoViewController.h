@@ -150,6 +150,7 @@ HXCustomCameraController;
 @property (assign, nonatomic) BOOL doneBtnEnabled;
 @property (assign, nonatomic) NSInteger selectCount;
 @property (strong, nonatomic) UIButton *originalBtn;
+@property (strong, nonatomic) UILabel *originalBytesLab;
 @property (strong, nonatomic) UIToolbar *bgView;
 - (void)requestPhotosBytes;
 @end
