@@ -3647,7 +3647,7 @@ if (!_previewBtn) {
     _previewBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     [_previewBtn setTitle:[NSBundle hx_localizedStringForKey:@"预览"] forState:UIControlStateNormal];
     [_previewBtn setTitleColor:[UIColor hx_colorWithHexStr:@"#363C54"] forState:UIControlStateNormal];
-    _previewBtn.titleLabel.font = [UIFont hx_pingFangFontOfSize:14];
+    _previewBtn.titleLabel.font = [UIFont hx_pingFangFontOfSize:16];
     _previewBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentLeft;
     [_previewBtn addTarget:self action:@selector(didPreviewClick) forControlEvents:UIControlEventTouchUpInside];
     _previewBtn.enabled = NO;
@@ -3671,7 +3671,7 @@ if (!_originalBtn) {
     _originalBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     [_originalBtn setTitle:[NSBundle hx_localizedStringForKey:@"原图"] forState:UIControlStateNormal];
     [_originalBtn addTarget:self action:@selector(didOriginalClick:) forControlEvents:UIControlEventTouchUpInside];
-    _originalBtn.titleLabel.font = [UIFont hx_pingFangFontOfSize:14];
+    _originalBtn.titleLabel.font = [UIFont hx_pingFangFontOfSize:16];
     _originalBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentLeft;
 }
 return _originalBtn;
@@ -3681,7 +3681,7 @@ return _originalBtn;
     if (!_originalBytesLab) {
         _originalBytesLab = [[UILabel alloc]init];
         _originalBytesLab.textColor = [UIColor hx_colorWithHexStr:@"#7B7E85"];
-        _originalBytesLab.font = [UIFont hx_pingFangFontOfSize:10];
+        _originalBytesLab.font = [UIFont hx_pingFangFontOfSize:12];
     }
     return  _originalBytesLab;
 }
