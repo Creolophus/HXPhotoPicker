@@ -152,7 +152,26 @@
     nvc.modalPresentationStyle = UIModalPresentationOverFullScreen;
     nvc.modalPresentationCapturesStatusBarAppearance = YES;
     nvc.navigationBar.hidden = YES;
-    [self presentViewController:nvc animated:YES completion:nil];}
+    [self presentViewController:nvc animated:YES completion:nil];
+}
+
+-(void)hx_pushPreviewControllerWithManager:(HXPhotoManager *)manager
+                                    models:(NSMutableArray<HXPhotoModel*>*)models
+                                  currentIndex:(NSInteger)currentIndex
+                                     {
+      [manager cancelBeforeSelectedList];
+      HXPhotoPreviewViewController *previewVC = [[HXPhotoPreviewViewController alloc] init];
+      if (HX_IOS9Earlier) {
+          // previewVC.photoViewController = self;
+      }
+      previewVC.disableaPersentInteractiveTransition = true;
+      previewVC.delegate = self;
+      previewVC.modelArray = [NSMutableArray arrayWithArray:models];
+      previewVC.manager = manager;
+      previewVC.currentModelIndex = currentIndex;
+      //  self.navigationController.delegate = previewVC;
+      [self.navigationController pushViewController:previewVC animated:YES];
+}
 
 - (void)hx_presentWxPhotoEditViewControllerWithConfiguration:(HXPhotoEditConfiguration * _Nonnull)configuration
                                                   photoModel:(HXPhotoModel * _Nonnull)photomodel

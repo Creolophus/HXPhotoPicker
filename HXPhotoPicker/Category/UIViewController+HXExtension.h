@@ -70,6 +70,15 @@
                                        currentIndex:(NSUInteger)currentIndex
                                           photoView:(HXPhotoView * _Nullable)photoView;
 
+
+/// 跳转预览页面 push 方式 ,当前控制器实现 HXPhotoPreviewViewControllerDelegate 获取相应回调事件
+/// @param manager 照片管理者
+/// @param models 预览对应的所有模型
+/// @param currentIndex 当前预览的下标
+-(void)hx_pushPreviewControllerWithManager:(HXPhotoManager *)manager
+                                    models:(NSMutableArray<HXPhotoModel*>*)models
+                              currentIndex:(NSInteger)currentIndex;
+
 /// 跳转相机界面
 /// @param manager 照片管理者
 /// @param delegate 代理
