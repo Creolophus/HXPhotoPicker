@@ -13,7 +13,7 @@
 #import "NSBundle+HXPhotoPicker.h"
 
 /// 当前版本
-#define HXVersion @"3.3.1"
+#define HXVersion @"3.3.2"
 
 // 日志输出
 #ifdef DEBUG
@@ -29,8 +29,6 @@
 /// 如果不实现此代理，item的小大将默认 (100, 100)
 #define HXPhotoViewCustomItemSize 0
 
-#define HX_ScreenWidth [UIScreen mainScreen].bounds.size.width
-#define HX_ScreenHeight [UIScreen mainScreen].bounds.size.height
 #define HX_Width(width) (HX_ScreenWidth/375.0*width/2.0)
 #define HX_Height(height) (HX_ScreenWidth/375.0*height/2.0)
 #define HX_FontSize(fontSize) (HX_ScreenWidth/375.0*fontSize/2.0)
@@ -115,7 +113,12 @@
 //判断iPHone12 ProMax
 #define HX_Is_iPhoneTwelveProMax ([UIScreen instancesRespondToSelector:@selector(currentMode)] ? CGSizeEqualToSize(CGSizeMake(1284, 2778), [[UIScreen mainScreen] currentMode].size) && !HX_UI_IS_IPAD : NO)
 
-#define HX_IS_IPhoneX_All (HX_Is_iPhoneX || HX_Is_iPhoneXR || HX_Is_iPhoneXS || HX_Is_iPhoneXS_MAX || HX_IS_IPHONEX || HX_Is_iPhoneTwelveMini || HX_Is_iPhoneTwelvePro || HX_Is_iPhoneTwelveProMax)
+//判断iPHone14 ProMax
+#define HX_Is_iPhone14ProMax ([UIScreen instancesRespondToSelector:@selector(currentMode)] ? CGSizeEqualToSize(CGSizeMake(1290, 2796), [[UIScreen mainScreen] currentMode].size) && !HX_UI_IS_IPAD : NO)
+//判断iPHone14 和 iPHone14 Pro
+#define HX_Is_iPhone14Pro ([UIScreen instancesRespondToSelector:@selector(currentMode)] ? CGSizeEqualToSize(CGSizeMake(1179, 2556), [[UIScreen mainScreen] currentMode].size) && !HX_UI_IS_IPAD : NO)
+
+#define HX_IS_IPhoneX_All (HX_Is_iPhoneX || HX_Is_iPhoneXR || HX_Is_iPhoneXS || HX_Is_iPhoneXS_MAX || HX_IS_IPHONEX || HX_Is_iPhoneTwelveMini || HX_Is_iPhoneTwelvePro || HX_Is_iPhoneTwelveProMax || HX_Is_iPhone14Pro || HX_Is_iPhone14ProMax)
 
 // 导航栏 + 状态栏 的高度
 #define hxNavigationBarHeight ((HX_UI_IS_IPAD ? 50 : 44) + HXStatusBarHeight)
