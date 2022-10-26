@@ -695,7 +695,7 @@
 
                 if (weakSelf.saveAlbum) {
                     UIImage *saveImage = photoEdit ? photoEdit.editPreviewImage : weakSelf.editImage;
-                    [HXPhotoTools savePhotoToCustomAlbumWithName:weakSelf.albumName photo:saveImage location:weakSelf.location complete:^(HXPhotoModel *model, BOOL success) {
+                    [HXPhotoTools savePhotoToCustomAlbumWithName:weakSelf.albumName photo:saveImage saveCustomAblum:NO location:weakSelf.location complete:^(HXPhotoModel *model, BOOL success) {
                         if (!success) {
                             model = [HXPhotoModel photoModelWithImage:saveImage];
                         }

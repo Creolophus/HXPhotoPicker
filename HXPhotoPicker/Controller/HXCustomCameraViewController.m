@@ -443,7 +443,7 @@ CLLocationManagerDelegate
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1f * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                 id location = self.location;
                 if (!self.videoURL) {
-                    [HXPhotoTools savePhotoToCustomAlbumWithName:self.manager.configuration.customAlbumName photo:self.imageView.image location:location complete:^(HXPhotoModel *model, BOOL success) {
+                    [HXPhotoTools savePhotoToCustomAlbumWithName:self.manager.configuration.customAlbumName photo:self.imageView.image saveCustomAblum:self.manager.configuration.saveCustomAblum location:location complete:^(HXPhotoModel *model, BOOL success) {
                         if (success) {
                             if (weakSelf.manager.configuration.cameraPhotoJumpEdit) {
                                 [weakSelf hx_presentPhotoEditViewControllerWithManager:weakSelf.manager photoModel:cameraModel delegate:nil done:^(HXPhotoModel *beforeModel, HXPhotoModel *afterModel, HXPhotoEditViewController *viewController) {
@@ -460,7 +460,7 @@ CLLocationManagerDelegate
                         }
                     }];
                 }else {
-                    [HXPhotoTools saveVideoToCustomAlbumWithName:self.manager.configuration.customAlbumName videoURL:self.videoURL location:location complete:^(HXPhotoModel *model, BOOL success) {
+                    [HXPhotoTools saveVideoToCustomAlbumWithName:self.manager.configuration.customAlbumName videoURL:self.videoURL saveCustomAblum:self.manager.configuration.saveCustomAblum location:location complete:^(HXPhotoModel *model, BOOL success) {
                         [weakSelf.view hx_handleLoading:NO];
                         if (success) {
                             model.videoURL = weakSelf.videoURL;

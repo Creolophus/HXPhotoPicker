@@ -644,7 +644,10 @@ HXPhotoPreviewViewController;
  *  支持添加到自定义相册 - (需9.0以上)
  */
 @property (assign, nonatomic) BOOL saveSystemAblum;
-
+/**
+ * saveSystemAblum YES 时，是否保存到自定义相薄 默认NO
+ */
+@property (assign, nonatomic) BOOL saveCustomAblum;
 /// 拍摄的照片/视频保存到指定相册的名称  默认 DisplayName
 /// 需9.0以上系统才可以保存到自定义相册 , 以下的系统只保存到相机胶卷...
 @property (copy, nonatomic) NSString *customAlbumName;

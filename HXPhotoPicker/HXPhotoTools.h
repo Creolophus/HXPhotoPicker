@@ -38,6 +38,7 @@
                               videoURL:(NSURL * _Nullable)videoURL;
 + (void)saveVideoToCustomAlbumWithName:(NSString * _Nullable)albumName
                               videoURL:(NSURL * _Nullable)videoURL
+                       saveCustomAblum:(BOOL)saveCustomAblum
                               location:(CLLocation * _Nullable)location
                               complete:(void (^ _Nullable)(HXPhotoModel * _Nullable model, BOOL success))complete;
 
@@ -48,6 +49,7 @@
                                  photo:(UIImage * _Nullable)photo;
 + (void)savePhotoToCustomAlbumWithName:(NSString * _Nullable)albumName
                                  photo:(UIImage * _Nullable)photo
+                       saveCustomAblum:(BOOL)saveCustomAblum
                               location:(CLLocation * _Nullable)location
                               complete:(void (^ _Nullable)(HXPhotoModel * _Nullable model, BOOL success))complete;
 

@@ -378,7 +378,7 @@ HXVideoEditBottomViewDelegate
     HXWeakSelf
     [HXPhotoTools exportEditVideoForAVAsset:self.avAsset timeRange:[self getTimeRange] exportPreset:self.manager.configuration.editVideoExportPreset videoQuality:self.manager.configuration.videoQuality success:^(NSURL *videoURL) {
         if (weakSelf.manager.configuration.editAssetSaveSystemAblum) {
-            [HXPhotoTools saveVideoToCustomAlbumWithName:weakSelf.manager.configuration.customAlbumName videoURL:videoURL location:weakSelf.model.location complete:^(HXPhotoModel * _Nullable model, BOOL success) {
+            [HXPhotoTools saveVideoToCustomAlbumWithName:weakSelf.manager.configuration.customAlbumName videoURL:videoURL saveCustomAblum:weakSelf.manager.configuration.saveCustomAblum location:weakSelf.model.location complete:^(HXPhotoModel * _Nullable model, BOOL success) {
                 weakSelf.bottomView.userInteractionEnabled = YES;
                 [weakSelf.view hx_handleLoading];
                 if (model) {

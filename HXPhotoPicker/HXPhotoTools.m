@@ -386,6 +386,7 @@ NSString *const hx_kKeyContentIdentifier = @"com.apple.quicktime.content.identif
 
 + (void)saveVideoToCustomAlbumWithName:(NSString *)albumName
                               videoURL:(NSURL *)videoURL
+                       saveCustomAblum:(BOOL)saveCustomAblum
                               location:(CLLocation *)location
                               complete:(void (^)(HXPhotoModel *model, BOOL success))complete {
     if (!videoURL) {
@@ -451,33 +452,35 @@ NSString *const hx_kKeyContentIdentifier = @"com.apple.quicktime.content.identif
                     }
                 }
             }
-            
-            // 拿到自定义的相册对象
-            PHAssetCollection *collection = [self createCollection:albumName];
-            if (collection == nil) {
-                if (HXShowLog) NSSLog(@"保存自定义相册失败");
-                return;
-            }
-            
-            [[PHPhotoLibrary sharedPhotoLibrary] performChangesAndWait:^{
-                [[PHAssetCollectionChangeRequest changeRequestForAssetCollection:collection] insertAssets:@[createdAsset] atIndexes:[NSIndexSet indexSetWithIndex:0]];
-            } error:&error];
-            
-            if (error) {
-                if (HXShowLog) NSSLog(@"保存自定义相册失败");
-            } else {
-                if (HXShowLog)  NSSLog(@"保存自定义相册成功");
+            if (saveCustomAblum) {
+                // 拿到自定义的相册对象
+                PHAssetCollection *collection = [self createCollection:albumName];
+                if (collection == nil) {
+                    if (HXShowLog) NSSLog(@"保存自定义相册失败");
+                    return;
+                }
+                
+                [[PHPhotoLibrary sharedPhotoLibrary] performChangesAndWait:^{
+                    [[PHAssetCollectionChangeRequest changeRequestForAssetCollection:collection] insertAssets:@[createdAsset] atIndexes:[NSIndexSet indexSetWithIndex:0]];
+                } error:&error];
+                
+                if (error) {
+                    if (HXShowLog) NSSLog(@"保存自定义相册失败");
+                } else {
+                    if (HXShowLog)  NSSLog(@"保存自定义相册成功");
+                }
             }
         });
     }];
 }
 
 + (void)saveVideoToCustomAlbumWithName:(NSString *)albumName videoURL:(NSURL *)videoURL {
-    [self saveVideoToCustomAlbumWithName:albumName videoURL:videoURL location:nil complete:nil];
+    [self saveVideoToCustomAlbumWithName:albumName videoURL:videoURL saveCustomAblum:NO location:nil complete:nil];
 }
 
 + (void)savePhotoToCustomAlbumWithName:(NSString *)albumName
                                  photo:(UIImage *)photo
+                       saveCustomAblum:(BOOL)saveCustomAblum
                               location:(CLLocation *)location
                               complete:(void (^)(HXPhotoModel *model, BOOL success))complete {
     if (!photo) {
@@ -542,27 +545,29 @@ NSString *const hx_kKeyContentIdentifier = @"com.apple.quicktime.content.identif
                 }
             }
             
-            // 拿到自定义的相册对象
-            PHAssetCollection *collection = [self createCollection:albumName];
-            if (collection == nil) {
-                if (HXShowLog) NSSLog(@"创建自定义相册失败");
-                return;
-            }
-            
-            [[PHPhotoLibrary sharedPhotoLibrary] performChangesAndWait:^{
-                [[PHAssetCollectionChangeRequest changeRequestForAssetCollection:collection] insertAssets:@[createdAsset] atIndexes:[NSIndexSet indexSetWithIndex:0]];
-            } error:&error];
-            
-            if (error != nil) {
-                if (HXShowLog) NSSLog(@"保存自定义相册失败");
-            } else {
-                if (HXShowLog) NSSLog(@"保存自定义相册成功");
+            if (saveCustomAblum) {
+                // 拿到自定义的相册对象
+                PHAssetCollection *collection = [self createCollection:albumName];
+                if (collection == nil) {
+                    if (HXShowLog) NSSLog(@"创建自定义相册失败");
+                    return;
+                }
+                
+                [[PHPhotoLibrary sharedPhotoLibrary] performChangesAndWait:^{
+                    [[PHAssetCollectionChangeRequest changeRequestForAssetCollection:collection] insertAssets:@[createdAsset] atIndexes:[NSIndexSet indexSetWithIndex:0]];
+                } error:&error];
+                
+                if (error != nil) {
+                    if (HXShowLog) NSSLog(@"保存自定义相册失败");
+                } else {
+                    if (HXShowLog) NSSLog(@"保存自定义相册成功");
+                }
             }
         });
     }];
 }
 + (void)savePhotoToCustomAlbumWithName:(NSString *)albumName photo:(UIImage *)photo {
-    [self savePhotoToCustomAlbumWithName:albumName photo:photo location:nil complete:nil];
+    [self savePhotoToCustomAlbumWithName:albumName photo:photo saveCustomAblum:NO  location:nil complete:nil];
 }
 // 创建自己要创建的自定义相册
 + (PHAssetCollection * )createCollection:(NSString *)albumName {
