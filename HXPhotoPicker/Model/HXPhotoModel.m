@@ -687,9 +687,13 @@
     }
     return self;
 }
-
+- (BOOL)networkPhoto {
+    return self.cameraPhotoType == HXPhotoModelMediaTypeCameraPhotoTypeNetWork ||
+    self.cameraPhotoType == HXPhotoModelMediaTypeCameraPhotoTypeNetWorkGif ||
+    self.cameraPhotoType == HXPhotoModelMediaTypeCameraPhotoTypeNetWorkLivePhoto;
+}
 - (void)encodeWithCoder:(NSCoder *)aCoder {
-    if (self.type == HXPhotoModelMediaTypeCameraPhoto ||
+    if ((self.type == HXPhotoModelMediaTypeCameraPhoto && ![self networkPhoto]) ||
         self.type == HXPhotoModelMediaTypeCameraVideo) {
         [aCoder encodeObject:self.thumbPhoto forKey:@"thumbPhoto"];
         [aCoder encodeObject:self.previewPhoto forKey:@"previewPhoto"];
